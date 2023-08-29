@@ -107,7 +107,7 @@ class DeliveryEnvironment(object):
             xytext = xy[0] + 0.1, xy[1] - 0.05
             ax.annotate("END", xy = xy, xytext = xytext, weight = "bold")
 
-        if hasattr(self,"box"):
+        if hasattr(self, "box"):
             left,bottom = self.box[0], self.box[2]
             width = self.box[1] - self.box[0]
             height = self.box[3] - self.box[2]
@@ -139,7 +139,7 @@ class DeliveryEnvironment(object):
 
         return first_stop
 
-    def step(self,destination):
+    def step(self, destination):
 
         # Get current state
         state = self._get_state()
@@ -178,64 +178,64 @@ class DeliveryEnvironment(object):
             intersections = self._calculate_box_intersection(xs, xe, ys, ye, self.box)
             if len(intersections) > 0:
                 i1,i2 = intersections
-                distance_traffic = np.sqrt((i2[1]-i1[1])**2 + (i2[0]-i1[0])**2)
+                distance_traffic = np.sqrt((i2[1] - i1[1])**2 + (i2[0] - i1[0])**2)
                 additional_reward = distance_traffic * self.traffic_intensity * np.random.rand()
             else:
                 additional_reward = np.random.rand()
             return base_reward + additional_reward
 
     @staticmethod
-    def _calculate_point(x1,x2,y1,y2,x = None,y = None):
+    def _calculate_point(x1, x2, y1, y2, x = None,y = None):
 
         if y1 == y2:
             return y1
         elif x1 == x2:
             return x1
         else:
-            a = (y2-y1)/(x2-x1)
+            a = (y2 - y1)/(x2 - x1)
             b = y2 - a * x2
 
             if x is None:
-                x = (y-b)/a
+                x = (y - b)/a
                 return x
             elif y is None:
-                y = a*x+b
+                y = a * x + b
                 return y
             else:
                 raise Exception("Provide x or y")
 
-    def _is_in_box(self,x,y,box):
+    def _is_in_box(self, x, y, box):
         # Get box coordinates
-        x_left,x_right,y_bottom,y_top = box
+        x_left, x_right, y_bottom, y_top = box
         return x >= x_left and x <= x_right and y >= y_bottom and y <= y_top
 
-    def _calculate_box_intersection(self,x1,x2,y1,y2,box):
+    def _calculate_box_intersection(self, x1, x2, y1, y2, box):
 
         # Get box coordinates
-        x_left,x_right,y_bottom,y_top = box
+        x_left, x_right, y_bottom, y_top = box
 
         # Intersections
         intersections = []
 
         # Top intersection
-        i_top = self._calculate_point(x1,x2,y1,y2,y=y_top)
+        i_top = self._calculate_point(x1, x2, y1, y2, y = y_top)
         if i_top > x_left and i_top < x_right:
-            intersections.append((i_top,y_top))
+            intersections.append((i_top, y_top))
 
         # Bottom intersection
-        i_bottom = self._calculate_point(x1,x2,y1,y2,y=y_bottom)
+        i_bottom = self._calculate_point(x1, x2, y1, y2, y = y_bottom)
         if i_bottom > x_left and i_bottom < x_right:
-            intersections.append((i_bottom,y_bottom))
+            intersections.append((i_bottom, y_bottom))
 
         # Left intersection
-        i_left = self._calculate_point(x1,x2,y1,y2,x=x_left)
+        i_left = self._calculate_point(x1, x2, y1, y2, x = x_left)
         if i_left > y_bottom and i_left < y_top:
-            intersections.append((x_left,i_left))
+            intersections.append((x_left, i_left))
 
         # Right intersection
-        i_right = self._calculate_point(x1,x2,y1,y2,x=x_right)
+        i_right = self._calculate_point(x1, x2, y1, y2, x = x_right)
         if i_right > y_bottom and i_right < y_top:
-            intersections.append((x_right,i_right))
+            intersections.append((x_right, i_right))
 
         return intersections
 
@@ -266,7 +266,7 @@ def run_episode(env, agent, verbose = 1):
         if verbose: print(s_next,r,done)
         
         # Update our knowledge in the Q-table
-        agent.train(s,a,r,s_next)
+        agent.train(s, a, r, s_next)
         
         # Update the caches
         episode_reward += r
@@ -281,11 +281,11 @@ def run_episode(env, agent, verbose = 1):
 
 class DeliveryQAgent(QAgent):
 
-    def __init__(self,*args,**kwargs):
-        super().__init__(*args,**kwargs)
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
         self.reset_memory()
 
-    def act(self,s):
+    def act(self, s):
 
         # Get Q Vector
         q = np.copy(self.Q[s,:])
@@ -307,7 +307,7 @@ class DeliveryQAgent(QAgent):
     def reset_memory(self):
         self.states_memory = []
 
-def run_n_episodes(env,agent,name="training.gif", n_episodes = 1000, render_each = 10, duration = 100):
+def run_n_episodes(env, agent, name = "training.gif", n_episodes = 1000, render_each = 10, duration = 100):
 
     # Store the rewards
     rewards = []
@@ -317,7 +317,7 @@ def run_n_episodes(env,agent,name="training.gif", n_episodes = 1000, render_each
     for i in tqdm_notebook(range(n_episodes)):
 
         # Run the episode
-        env,agent,episode_reward = run_episode(env,agent,verbose = 0)
+        env, agent, episode_reward = run_episode(env, agent, verbose = 0)
         rewards.append(episode_reward)
         
         if i % render_each == 0:
